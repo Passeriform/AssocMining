@@ -13,8 +13,8 @@ class HashSet:
     ]
     """
     def __init__(self):
+        self.rawSrc = list()
         self.dictArray = list(dict())
-        self.fstr = None
 
 
     def __iter__(self):
@@ -36,41 +36,38 @@ class HashSet:
 
 
     def get_set_index(self, in_set):
-
         for idx, item in enumerate(self.dictArray):
             if in_set == item['set']:
                 return idx
 
-        return flag
 
     def add(self, setDict):
         self.dictArray.append({'set': set(setDict['set']), 'count': setDict['count']})
 
-    def fromFile(self, fstr):
-        self.fstr = fstr
-        file = open(fstr)
 
-        for line in file:
+    def next(self, hashSet):
+        hashSet.rawSrc = self.rawSrc;
+        return hashSet
+
+
+    def fromRaw(self, strArr):
+        for line in strArr:
+            collector = set()
             for item in map(str.strip, line.split(',')):
+                collector = collector.union(item)
                 if self.check_set_exists(set(item)):
                     self.dictArray[self.get_set_index(set(item))]['count'] += 1
                 else:
                     self.add({'set': set(item), 'count': 1})
+            self.rawSrc.append(collector)
 
-        file.close()
+        return self
 
-        return self.dictArray
 
     def reHash(self):
-        file = open(self.fstr)
+        for idx, item in enumerate(self.dictArray):
+            for testset in self.rawSrc:
+                if set(item['set']).issubset(testset):
+                    self.dictArray[idx]['count'] += 1
 
-        for element in self.dictArray:
-            for item in map(str.strip, line.split(',')):
-                if self.check_set_exists(set(item)):
-                    self.dictArray[self.get_set_index(set(item))]['count'] += 1
-                else:
-                    self.add({'set': set(item), 'count': 1})
-
-        file.close()
-
-    # if __name__ == '__main__':
+        return self
